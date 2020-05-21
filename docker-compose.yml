@@ -1,0 +1,71 @@
+version: '3'
+
+services:
+
+  mongo:
+    image: "mongo:latest"
+
+  postgres:
+    image: "postgres:latest"
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=database
+
+  squzy_storage:
+    image: "squzy/squzy_storage:v1.7.0"
+    restart: on-failure
+    depends_on:
+      - postgres
+    environment:
+      - DB_HOST=postgres
+      - DB_NAME=database
+      - DB_USER=user
+      - DB_PASSWORD=password
+      - DB_PORT=5432
+      - PORT=9092
+
+  squzy_monitoring:
+    image: "squzy/squzy_monitoring:v1.7.0"
+    restart: on-failure
+    depends_on:
+      - mongo
+    environment:
+      - PORT=9090
+      - MONGO_URI=mongodb://mongo
+      - SQUZY_STORAGE_HOST=squzy_storage:9092
+
+  squzy_agent_server:
+    image: "squzy/squzy_agent_server:v1.7.0"
+    restart: on-failure
+    depends_on:
+      - mongo
+    environment:
+      - PORT=9091
+      - MONGO_URI=mongodb://mongo
+      - SQUZY_STORAGE_HOST=squzy_storage:9092
+    ports:
+      - "9091:9091"
+
+  squzy_api:
+    image: "squzy/squzy_api:v1.7.0"
+    restart: on-failure
+    depends_on:
+      - squzy_agent_server
+      - squzy_monitoring
+      - squzy_storage
+    environment:
+      - PORT=8080
+      - MONITORING_SERVER_HOST=squzy_monitoring:9090
+      - AGENT_SERVER_HOST=squzy_agent_server:9091
+      - STORAGE_SERVER_HOST=squzy_storage:9092
+
+  squzy_dashboard:
+    image: "squzy/squzy_dashboard:v1.7.0"
+    restart: on-failure
+    depends_on:
+      - squzy_api
+    environment:
+      - API_HOST=squzy_api:8080
+    ports:
+      - "80:80"
