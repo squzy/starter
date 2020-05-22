@@ -14,7 +14,7 @@ After that you can download semantic version of client from [release page](https
 
 And run:
 ```sh
-SQUZY_AGENT_SERVER_HOST=localhost:9091 ./szy_agent_v1.7.0-darwin-amd64
+SQUZY_AGENT_SERVER_HOST=localhost:9091 ./squzy_agent_v1.7.0-darwin-amd64
 ```
 
 ## Dashboard
