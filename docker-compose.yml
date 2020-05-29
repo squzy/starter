@@ -69,3 +69,9 @@ services:
       - API_HOST=squzy_api:8080
     ports:
       - "80:80"
+
+  squzy_web:
+    image: "squzy/squzy_web:v1.7.1"
+    restart: on-failure
+    ports:
+      - "8080:80"
