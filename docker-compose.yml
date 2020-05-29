@@ -13,7 +13,7 @@ services:
       - POSTGRES_DB=database
 
   squzy_storage:
-    image: "squzy/squzy_storage:v1.7.0"
+    image: "squzy/squzy_storage:v1.7.1"
     restart: on-failure
     depends_on:
       - postgres
@@ -26,7 +26,7 @@ services:
       - PORT=9092
 
   squzy_monitoring:
-    image: "squzy/squzy_monitoring:v1.7.0"
+    image: "squzy/squzy_monitoring:v1.7.1"
     restart: on-failure
     depends_on:
       - mongo
@@ -36,7 +36,7 @@ services:
       - SQUZY_STORAGE_HOST=squzy_storage:9092
 
   squzy_agent_server:
-    image: "squzy/squzy_agent_server:v1.7.0"
+    image: "squzy/squzy_agent_server:v1.7.1"
     restart: on-failure
     depends_on:
       - mongo
@@ -48,7 +48,7 @@ services:
       - "9091:9091"
 
   squzy_api:
-    image: "squzy/squzy_api:v1.7.0"
+    image: "squzy/squzy_api:v1.7.1"
     restart: on-failure
     depends_on:
       - squzy_agent_server
@@ -61,7 +61,7 @@ services:
       - STORAGE_SERVER_HOST=squzy_storage:9092
 
   squzy_dashboard:
-    image: "squzy/squzy_dashboard:v1.7.0"
+    image: "squzy/squzy_dashboard:v1.7.1"
     restart: on-failure
     depends_on:
       - squzy_api
