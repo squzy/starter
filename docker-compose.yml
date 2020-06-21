@@ -87,7 +87,6 @@ services:
       - mongo
       - squzy_storage
     environment:
-      - API_HOST=squzy_api:8080
       - PORT=9095
       - MONGO_URI=mongodb://mongo
       - SQUZY_STORAGE_HOST=squzy_storage:9092
