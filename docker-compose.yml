@@ -17,7 +17,7 @@ services:
       - ./postgres-data:/var/lib/postgresql/data  
 
   squzy_storage:
-    image: "squzy/squzy_storage:v1.7.1"
+    image: "squzy/squzy_storage:v1.8.0"
     restart: on-failure
     depends_on:
       - postgres
@@ -30,20 +30,22 @@ services:
       - PORT=9092
 
   squzy_monitoring:
-    image: "squzy/squzy_monitoring:v1.7.1"
+    image: "squzy/squzy_monitoring:v1.8.0"
     restart: on-failure
     depends_on:
       - mongo
+      - squzy_storage
     environment:
       - PORT=9090
       - MONGO_URI=mongodb://mongo
       - SQUZY_STORAGE_HOST=squzy_storage:9092
 
   squzy_agent_server:
-    image: "squzy/squzy_agent_server:v1.7.1"
+    image: "squzy/squzy_agent_server:v1.8.0"
     restart: on-failure
     depends_on:
       - mongo
+      - squzy_storage
     environment:
       - PORT=9091
       - MONGO_URI=mongodb://mongo
@@ -52,20 +54,24 @@ services:
       - "9091:9091"
 
   squzy_api:
-    image: "squzy/squzy_api:v1.7.1"
+    image: "squzy/squzy_api:v1.8.0"
     restart: on-failure
     depends_on:
       - squzy_agent_server
       - squzy_monitoring
       - squzy_storage
+      - squzy_application_monitoring
     environment:
       - PORT=8080
       - MONITORING_SERVER_HOST=squzy_monitoring:9090
       - AGENT_SERVER_HOST=squzy_agent_server:9091
       - STORAGE_SERVER_HOST=squzy_storage:9092
+      - APPLICATION_MONITORING_SERVER_HOST=squzy_application_monitoring:9095
+    ports:
+      - "8080:8080"
 
   squzy_dashboard:
-    image: "squzy/squzy_dashboard:v1.7.1"
+    image: "squzy/squzy_dashboard:v1.8.0"
     restart: on-failure
     depends_on:
       - squzy_api
@@ -74,8 +80,20 @@ services:
     ports:
       - "8081:80"
 
+  squzy_application_monitoring:
+    image: "squzy/squzy_application_monitoring:v1.8.0"
+    restart: on-failure
+    depends_on:
+      - mongo
+      - squzy_storage
+    environment:
+      - API_HOST=squzy_api:8080
+      - PORT=9095
+      - MONGO_URI=mongodb://mongo
+      - SQUZY_STORAGE_HOST=squzy_storage:9092
+
   squzy_web:
-    image: "squzy/squzy_web:v1.7.1"
+    image: "squzy/squzy_web:v1.8.0"
     restart: on-failure
     ports:
       - "8080:80"
