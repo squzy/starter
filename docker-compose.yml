@@ -68,7 +68,7 @@ services:
       - STORAGE_SERVER_HOST=squzy_storage:9092
       - APPLICATION_MONITORING_SERVER_HOST=squzy_application_monitoring:9095
     ports:
-      - "8080:8080"
+      - "8082:8080"
 
   squzy_dashboard:
     image: "squzy/squzy_dashboard:v1.8.0"
