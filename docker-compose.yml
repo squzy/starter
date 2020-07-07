@@ -17,11 +17,13 @@ services:
       - ./postgres-data:/var/lib/postgresql/data  
 
   squzy_storage:
-    image: "squzy/squzy_storage:v1.8.0"
+    image: "squzy/squzy_storage:v1.9.0"
     restart: on-failure
     depends_on:
       - postgres
     environment:
+      - INCIDENT_SERVER_HOST=squzy_incident_management:9097
+      - ENABLE_INCIDENT=true
       - DB_HOST=postgres
       - DB_NAME=database
       - DB_USER=user
@@ -30,7 +32,7 @@ services:
       - PORT=9092
 
   squzy_monitoring:
-    image: "squzy/squzy_monitoring:v1.8.0"
+    image: "squzy/squzy_monitoring:v1.9.0"
     restart: on-failure
     depends_on:
       - mongo
@@ -41,7 +43,7 @@ services:
       - SQUZY_STORAGE_HOST=squzy_storage:9092
 
   squzy_agent_server:
-    image: "squzy/squzy_agent_server:v1.8.0"
+    image: "squzy/squzy_agent_server:v1.9.0"
     restart: on-failure
     depends_on:
       - mongo
@@ -54,7 +56,7 @@ services:
       - "9091:9091"
 
   squzy_api:
-    image: "squzy/squzy_api:v1.8.0"
+    image: "squzy/squzy_api:v1.9.0"
     restart: on-failure
     depends_on:
       - squzy_agent_server
@@ -63,6 +65,7 @@ services:
       - squzy_application_monitoring
     environment:
       - PORT=8080
+      - INCIDENT_SERVER_HOST=squzy_incident_management:9097
       - MONITORING_SERVER_HOST=squzy_monitoring:9090
       - AGENT_SERVER_HOST=squzy_agent_server:9091
       - STORAGE_SERVER_HOST=squzy_storage:9092
@@ -71,7 +74,7 @@ services:
       - "8082:8080"
 
   squzy_dashboard:
-    image: "squzy/squzy_dashboard:v1.8.0"
+    image: "squzy/squzy_dashboard:v1.9.0"
     restart: on-failure
     depends_on:
       - squzy_api
@@ -81,7 +84,7 @@ services:
       - "8081:80"
 
   squzy_application_monitoring:
-    image: "squzy/squzy_application_monitoring:v1.8.0"
+    image: "squzy/squzy_application_monitoring:v1.9.0"
     restart: on-failure
     depends_on:
       - mongo
@@ -91,8 +94,17 @@ services:
       - MONGO_URI=mongodb://mongo
       - SQUZY_STORAGE_HOST=squzy_storage:9092
 
+  squzy_incident_management:
+    image: "squzy/squzy_incident:v1.9.0"
+    restart: on-failure
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URI=mongodb://mongo
+      - STORAGE_HOST=squzy_storage:9092
+
   squzy_web:
-    image: "squzy/squzy_web:v1.8.0"
+    image: "squzy/squzy_web:v1.9.0"
     restart: on-failure
     ports:
       - "8080:80"
