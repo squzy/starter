@@ -17,7 +17,7 @@ services:
       - ./postgres-data:/var/lib/postgresql/data  
 
   squzy_storage:
-    image: "squzy/squzy_storage:v1.9.0"
+    image: "squzy/squzy_storage:v1.10.0"
     restart: on-failure
     depends_on:
       - postgres
@@ -32,7 +32,7 @@ services:
       - PORT=9092
 
   squzy_monitoring:
-    image: "squzy/squzy_monitoring:v1.9.0"
+    image: "squzy/squzy_monitoring:v1.10.0"
     restart: on-failure
     depends_on:
       - mongo
@@ -43,7 +43,7 @@ services:
       - SQUZY_STORAGE_HOST=squzy_storage:9092
 
   squzy_agent_server:
-    image: "squzy/squzy_agent_server:v1.9.0"
+    image: "squzy/squzy_agent_server:v1.10.0"
     restart: on-failure
     depends_on:
       - mongo
@@ -56,13 +56,15 @@ services:
       - "9091:9091"
 
   squzy_api:
-    image: "squzy/squzy_api:v1.9.0"
+    image: "squzy/squzy_api:v1.10.0"
     restart: on-failure
     depends_on:
       - squzy_agent_server
       - squzy_monitoring
       - squzy_storage
       - squzy_application_monitoring
+      - squzy_notification_management
+      - squzy_incident_management
     environment:
       - PORT=8080
       - INCIDENT_SERVER_HOST=squzy_incident_management:9097
@@ -70,11 +72,12 @@ services:
       - AGENT_SERVER_HOST=squzy_agent_server:9091
       - STORAGE_SERVER_HOST=squzy_storage:9092
       - APPLICATION_MONITORING_SERVER_HOST=squzy_application_monitoring:9095
+      - NOTIFICATION_SERVER_HOST=squzy_notification_management:9098
     ports:
       - "8082:8080"
 
   squzy_dashboard:
-    image: "squzy/squzy_dashboard:v1.9.1"
+    image: "squzy/squzy_dashboard:v1.10.0"
     restart: on-failure
     depends_on:
       - squzy_api
@@ -84,7 +87,7 @@ services:
       - "8081:80"
 
   squzy_application_monitoring:
-    image: "squzy/squzy_application_monitoring:v1.9.0"
+    image: "squzy/squzy_application_monitoring:v1.10.0"
     restart: on-failure
     depends_on:
       - mongo
@@ -95,16 +98,28 @@ services:
       - SQUZY_STORAGE_HOST=squzy_storage:9092
 
   squzy_incident_management:
-    image: "squzy/squzy_incident:v1.9.0"
+    image: "squzy/squzy_incident:v1.10.0"
     restart: on-failure
     depends_on:
       - mongo
     environment:
       - MONGO_URI=mongodb://mongo
       - STORAGE_HOST=squzy_storage:9092
+      - NOTIFICATION_HOST=squzy_notification_management:9098
+
+  squzy_notification_management:
+    image: "squzy/squzy_notification:v1.10.0"
+    restart: on-failure
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URI=mongodb://mongo
+      - STORAGE_HOST=squzy_storage:9092
+      - DASHBOARD_HOST=https://demo.squzy.app
+      - PORT=9098
 
   squzy_web:
-    image: "squzy/squzy_web:v1.9.0"
+    image: "squzy/squzy_web:v1.10.0"
     restart: on-failure
     ports:
       - "8080:80"
