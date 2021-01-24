@@ -19,6 +19,6 @@ SQUZY_AGENT_SERVER_HOST=localhost:9091 ./squzy_agent_v1.9.0-darwin-amd64
 
 ## Dashboard
 
-You will see all information on [http://localhost:80](http://localhost:80)
+You will see all information on [http://localhost:8081](http://localhost:8081)
 
 By default it us will be use latest release version
