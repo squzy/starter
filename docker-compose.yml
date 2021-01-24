@@ -17,7 +17,7 @@ services:
       - ./postgres-data:/var/lib/postgresql/data  
 
   squzy_storage:
-    image: "squzy/squzy_storage:v1.11.0"
+    image: "squzy/squzy_storage:v1.11.1"
     restart: on-failure
     depends_on:
       - postgres
@@ -29,34 +29,37 @@ services:
       - DB_USER=user
       - DB_PASSWORD=password
       - DB_PORT=5432
+      - LOG_LEVEL=info
       - PORT=9092
 
   squzy_monitoring:
-    image: "squzy/squzy_monitoring:v1.11.0"
+    image: "squzy/squzy_monitoring:v1.11.1"
     restart: on-failure
     depends_on:
       - mongo
       - squzy_storage
     environment:
       - PORT=9090
+      - LOG_LEVEL=info
       - MONGO_URI=mongodb://mongo
       - SQUZY_STORAGE_HOST=squzy_storage:9092
 
   squzy_agent_server:
-    image: "squzy/squzy_agent_server:v1.11.0"
+    image: "squzy/squzy_agent_server:v1.11.1"
     restart: on-failure
     depends_on:
       - mongo
       - squzy_storage
     environment:
       - PORT=9091
+      - LOG_LEVEL=info
       - MONGO_URI=mongodb://mongo
       - SQUZY_STORAGE_HOST=squzy_storage:9092
     ports:
       - "9091:9091"
 
   squzy_api:
-    image: "squzy/squzy_api:v1.11.0"
+    image: "squzy/squzy_api:v1.11.1"
     restart: on-failure
     depends_on:
       - squzy_agent_server
@@ -67,6 +70,7 @@ services:
       - squzy_incident_management
     environment:
       - PORT=8080
+      - LOG_LEVEL=info
       - INCIDENT_SERVER_HOST=squzy_incident_management:9097
       - MONITORING_SERVER_HOST=squzy_monitoring:9090
       - AGENT_SERVER_HOST=squzy_agent_server:9091
@@ -87,32 +91,35 @@ services:
       - "8081:80"
 
   squzy_application_monitoring:
-    image: "squzy/squzy_application_monitoring:v1.11.0"
+    image: "squzy/squzy_application_monitoring:v1.11.1"
     restart: on-failure
     depends_on:
       - mongo
       - squzy_storage
     environment:
       - PORT=9095
+      - LOG_LEVEL=info
       - MONGO_URI=mongodb://mongo
       - SQUZY_STORAGE_HOST=squzy_storage:9092
 
   squzy_incident_management:
-    image: "squzy/squzy_incident:v1.11.0"
+    image: "squzy/squzy_incident:v1.11.1"
     restart: on-failure
     depends_on:
       - mongo
     environment:
       - MONGO_URI=mongodb://mongo
+      - LOG_LEVEL=info
       - STORAGE_HOST=squzy_storage:9092
       - NOTIFICATION_HOST=squzy_notification_management:9098
 
   squzy_notification_management:
-    image: "squzy/squzy_notification:v1.11.0"
+    image: "squzy/squzy_notification:v1.11.1"
     restart: on-failure
     depends_on:
       - mongo
     environment:
+      - LOG_LEVEL=info
       - MONGO_URI=mongodb://mongo
       - STORAGE_HOST=squzy_storage:9092
       - DASHBOARD_HOST=https://demo.squzy.app
