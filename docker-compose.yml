@@ -16,6 +16,7 @@ services:
     volumes:
       - ./postgres-data:/var/lib/postgresql/data
 
+  # Need just for reverse traffic for demo.squzy.app
   proxy_http:
       image: "nginx_proxy:latest"
 
