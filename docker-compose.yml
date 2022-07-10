@@ -5,9 +5,11 @@ services:
   mongo:
     image: "mongo:4.2"
     volumes:
-      - './data:/data/db'
+      - './data/mongo:/data/db'
 
   clickhouse:
+# for M1 macs
+#    image: "lunalabsltd Authentication failed/clickhouse-server:21.7.2.7-arm"
     image: "yandex/clickhouse-server:latest"
     volumes:
       - ./data/clickhouse/data:/var/lib/clickhouse
@@ -31,7 +33,7 @@ services:
       - DB_HOST=clickhouse
       - DB_NAME=default
       - DB_USER=default
-      - DB_PASSWORD=default
+      - DB_PASSWORD=
       - DB_PORT=9000
       - LOG_LEVEL=info
       - PORT=9092
