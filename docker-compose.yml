@@ -7,7 +7,7 @@ services:
     volumes:
       - './data/mongo:/data/db'
   redis:
-    image: "redis:7.0.8"
+    image: "redis:7.0"
     volumes:
       - './data/redis:/var/lib/redis'
       - './data/redis.conf:/usr/local/etc/redis/redis.conf'
